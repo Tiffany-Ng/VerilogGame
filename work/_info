@@ -1,0 +1,130 @@
+m255
+K4
+z2
+13
+!s112 1.1
+!i10d 8192
+!i10e 25
+!i10f 100
+cModel Technology
+Z0 dC:/Users/TiMSI17/Desktop/csc258/works
+vcontrol
+Z1 !s110 1521638895
+!i10b 1
+!s100 _WcFna7T[KW68]PNnc`PJ2
+IYFRbfgVmP03D;ZUReY4n53
+Z2 VDg1SIo80bB@j0V0VzS_@n1
+R0
+Z3 w1521638772
+Z4 8game.v
+Z5 Fgame.v
+L0 287
+Z6 OV;L;10.4d;61
+r1
+!s85 0
+31
+Z7 !s108 1521638894.000000
+Z8 !s107 game.v|
+Z9 !s90 -reportprogress|300|-timescale|1ns/1ns|game.v|
+!i113 1
+Z10 o-timescale 1ns/1ns
+vcount
+R1
+!i10b 1
+!s100 M;A95]f4g97LVc2hT>Kj`1
+I7C@UWaVfDNV1LMC<1PdB^3
+R2
+R0
+R3
+R4
+R5
+L0 494
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+vdatapath
+R1
+!i10b 1
+!s100 ^1?IY4NmXQAHE7N6@O`343
+IBH:EZD7c_DS5H3j]M=neQ0
+R2
+R0
+R3
+R4
+R5
+L0 225
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+vgame
+R1
+!i10b 1
+!s100 [F4<:2cgRR<69k[iTFTOH1
+IH>z8Tl85739Son2mQ0NG[2
+R2
+R0
+R3
+R4
+R5
+L0 1
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10
+vhex_decoder
+!s110 1521638570
+!i10b 1
+!s100 C16b>XIiO:eE?L]aLHPF`3
+IECa;:UBlQKa2]F:Mm^5GJ0
+R2
+R0
+w1521638559
+R4
+R5
+L0 631
+R6
+r1
+!s85 0
+31
+!s108 1521638570.000000
+R8
+R9
+!i113 1
+R10
+vpart2
+R1
+!i10b 1
+!s100 <Df[Xc]hP3G1OaK3IkUo31
+IMiF76]fLGgDEJaBk0zGAK2
+R2
+R0
+R3
+R4
+R5
+L0 50
+R6
+r1
+!s85 0
+31
+R7
+R8
+R9
+!i113 1
+R10

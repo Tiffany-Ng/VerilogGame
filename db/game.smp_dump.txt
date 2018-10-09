@@ -1,0 +1,16 @@
+
+State Machine - |game|part2:p2|control:c0|current_state
+Name current_state.CHECK_END current_state.CHANGE_WAIT current_state.DRAW_BUFFER_3 current_state.DRAW_BUFFER_2 current_state.DRAW_BUFFER_1 current_state.DRAW_BUFFER_0 current_state.CHANGE current_state.ERASE current_state.SET_ERASE current_state.FRAME_WAIT current_state.DRAW_SELF current_state.S_LOAD_WAIT current_state.S_LOAD 
+current_state.S_LOAD 0 0 0 0 0 0 0 0 0 0 0 0 0 
+current_state.S_LOAD_WAIT 0 0 0 0 0 0 0 0 0 0 0 1 1 
+current_state.DRAW_SELF 0 0 0 0 0 0 0 0 0 0 1 0 1 
+current_state.FRAME_WAIT 0 0 0 0 0 0 0 0 0 1 0 0 1 
+current_state.SET_ERASE 0 0 0 0 0 0 0 0 1 0 0 0 1 
+current_state.ERASE 0 0 0 0 0 0 0 1 0 0 0 0 1 
+current_state.CHANGE 0 0 0 0 0 0 1 0 0 0 0 0 1 
+current_state.DRAW_BUFFER_0 0 0 0 0 0 1 0 0 0 0 0 0 1 
+current_state.DRAW_BUFFER_1 0 0 0 0 1 0 0 0 0 0 0 0 1 
+current_state.DRAW_BUFFER_2 0 0 0 1 0 0 0 0 0 0 0 0 1 
+current_state.DRAW_BUFFER_3 0 0 1 0 0 0 0 0 0 0 0 0 1 
+current_state.CHANGE_WAIT 0 1 0 0 0 0 0 0 0 0 0 0 1 
+current_state.CHECK_END 1 0 0 0 0 0 0 0 0 0 0 0 1 

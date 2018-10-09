@@ -1,0 +1,218 @@
+// Part 2 skeleton
+
+module laser
+	(
+		CLOCK_50,						//	On Board 50 MHz
+		// Your inputs and outputs here
+        KEY,
+        SW,
+		// The ports below are for the VGA output.  Do not change.
+		VGA_CLK,   						//	VGA Clock
+		VGA_HS,							//	VGA H_SYNC
+		VGA_VS,							//	VGA V_SYNC
+		VGA_BLANK_N,						//	VGA BLANK
+		VGA_SYNC_N,						//	VGA SYNC
+		VGA_R,   						//	VGA Red[9:0]
+		VGA_G,	 						//	VGA Green[9:0]
+		VGA_B   						//	VGA Blue[9:0]
+	);
+
+	input			CLOCK_50;				//	50 MHz
+	input   [9:0]   SW;
+	input   [3:0]   KEY;
+
+	// Declare your inputs and outputs here
+	// Do not change the following outputs
+	output			VGA_CLK;   				//	VGA Clock
+	output			VGA_HS;					//	VGA H_SYNC
+	output			VGA_VS;					//	VGA V_SYNC
+	output			VGA_BLANK_N;				//	VGA BLANK
+	output			VGA_SYNC_N;				//	VGA SYNC
+	output	[9:0]	VGA_R;   				//	VGA Red[9:0]
+	output	[9:0]	VGA_G;	 				//	VGA Green[9:0]
+	output	[9:0]	VGA_B;   				//	VGA Blue[9:0]
+	
+	wire resetn;
+	assign resetn = KEY[0];
+	
+	// Create the colour, x, y and writeEn wires that are inputs to the controller.
+	wire [2:0] colour;
+	wire [7:0] x;
+	wire [6:0] y;
+	wire writeEn;
+	
+	wire ld_x, s_draw, draw, f_wait, s_erase, erase, pls_y, start;
+	
+	wire [19:0] frame;  // 0 - 833333
+	
+	wire [3:0] shift;
+	
+	// Create an Instance of a VGA controller - there can be only one!
+	// Define the number of colours as well as the initial background
+	// image file (.MIF) for the controller.
+	vga_adapter VGA(
+			.resetn(resetn),
+			.clock(CLOCK_50),
+			.colour(colour),
+			.x(x),
+			.y(y),
+			.plot(writeEn),
+			/* Signals for the DAC to drive the monitor. */
+			.VGA_R(VGA_R),
+			.VGA_G(VGA_G),
+			.VGA_B(VGA_B),
+			.VGA_HS(VGA_HS),
+			.VGA_VS(VGA_VS),
+			.VGA_BLANK(VGA_BLANK_N),
+			.VGA_SYNC(VGA_SYNC_N),
+			.VGA_CLK(VGA_CLK));
+		defparam VGA.RESOLUTION = "160x120";
+		defparam VGA.MONOCHROME = "FALSE";
+		defparam VGA.BITS_PER_COLOUR_CHANNEL = 1;
+		defparam VGA.BACKGROUND_IMAGE = "black.mif";
+			
+	// Put your code here. Your code should produce signals x,y,colour and writeEn/plot
+	// for the VGA controller, in addition to any other functionality your design may require.
+    
+    // Instansiate datapath
+	// datapath d0(...);
+	datapath d0(
+		.clk(CLOCK_50), 
+		.ld_x(ld_x), .s_draw(s_draw), .draw(draw), .f_wait(f_wait), 
+		.s_erase(s_erase), .erase(erase), .pls_y(pls_y), .start(start), 
+		.x(x), .y(y), .colour(colour), .writeEn(writeEn), 
+		.shift(shift), .frame(frame)
+	);
+	
+	
+    // Instansiate FSM control
+    // control c0(...);
+	control c0(
+		.clk(CLOCK_50), .resetn(KEY[0]), .shift(shift), .frame(frame),
+		.ld_x(ld_x), .s_draw(s_draw), .draw(draw), .f_wait(f_wait), .start(start), 
+		.s_erase(s_erase), .erase(erase), .pls_y(pls_y)
+	);
+    
+endmodule
+
+module control(
+	input clk, input resetn, input [3:0] shift, input [20:0] frame,
+	output reg ld_x, output reg s_draw, output reg draw, output reg f_wait, output reg start,
+	output reg s_erase, output reg erase, output reg pls_y);
+	
+	reg[2:0] current_state, next_state;
+	
+	localparam  LOAD_X 		= 3'd0,
+				SET_DRAW	= 3'd1,
+				DRAW 		= 3'd2,
+				FRAME_WAIT	= 3'd3,
+				SET_ERASE	= 3'd4,
+				ERASE 		= 3'd5,
+				PLUS_Y		= 3'd6,
+				START			= 3'd7;
+				
+	always @(*)
+	begin: state_table
+		case (current_state)
+			START:	next_state = LOAD_X;
+			LOAD_X: 	next_state = SET_DRAW;
+			SET_DRAW: 	next_state = DRAW;
+			DRAW: 		next_state = (shift == 4'b1000) ? FRAME_WAIT : DRAW;
+			FRAME_WAIT:	next_state = (frame == 20'd833333) ? SET_ERASE : FRAME_WAIT;
+			SET_ERASE:	next_state = ERASE;
+			ERASE: 		next_state = (shift == 4'b1000) ? PLUS_Y : ERASE;
+			PLUS_Y: 	next_state = SET_DRAW;
+			default: 	next_state = LOAD_X; 
+		endcase
+	end
+	
+	always @(*)
+	begin: enable_signals
+		start = 1'b1;
+		ld_x 	= 1'b0;
+		s_draw 	= 1'b0;
+		draw 	= 1'b0;
+		f_wait  = 1'b0;
+		s_erase = 1'b0;
+		erase 	= 1'b0;
+		pls_y 	= 1'b0;
+		
+		case (current_state)
+			START:	start = 1'b1;
+			LOAD_X: 	ld_x 	= 1'b1;
+			SET_DRAW: 	s_draw 	= 1'b1;
+			DRAW: 		draw 	= 1'b1;
+			FRAME_WAIT:	f_wait	= 1'b1;
+			SET_ERASE:	s_erase = 1'b1;
+			ERASE: 		erase 	= 1'b1;
+			PLUS_Y: 	pls_y 	= 1'b1;
+		endcase
+	end
+	
+	always@(posedge clk)
+    begin: state_FFs
+        if(!resetn)
+            current_state <= LOAD_X;
+        else
+            current_state <= next_state;
+    end 
+	
+endmodule
+
+module datapath(
+	input clk,
+	input ld_x, input s_draw, input draw, input s_erase, input erase, input pls_y, input f_wait, input start,
+	output reg [7:0] x, output reg [6:0] y, output reg [3:0] colour, 
+	output reg writeEn, output reg [3:0] shift, output reg [19:0] frame);
+	
+	reg [7:0] x_pos;
+	reg [6:0] y_pos;
+	
+	
+	always @(posedge clk) begin
+		
+		writeEn = 1'b0;
+		
+		if (start) begin
+			x = 8'd10;
+			y = 7'd5;
+		end
+		
+		if (ld_x) begin
+			x_pos <= x;
+			y_pos <= y;
+		end
+		
+		if (s_draw) begin
+			shift <= 4'd0;
+			frame <= 20'd0;
+		end
+		
+		if (draw) begin
+			colour = 3'b111;
+			x = x_pos + shift[0];
+			y = y_pos + shift[2:1];
+			shift <= shift + 1;
+			writeEn = 1'b1;
+		end
+		
+		if (f_wait)
+			frame <= frame + 1;
+		
+		if (s_erase)
+			shift <= 4'd0;
+			
+		if (erase) begin
+			colour = 3'b000;
+			x = x_pos + shift[0];
+			y = y_pos + shift[2:1];
+			shift <= shift + 1;
+			writeEn = 1'b1;
+		end
+		
+		if (pls_y)
+			y_pos <= y_pos + 1;
+		
+	end
+
+endmodule
